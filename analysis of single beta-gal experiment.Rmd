@@ -24,7 +24,7 @@ Fill in **each** cell in these seven columns:
 2. For **date**, please give them in format YYYY-MM-DD, ie "2018-06-07". This date should correspond to the date noted in your lab notebook when this experiment was done.
 3. For **strain**, please use your personal strain number (I.e LB32, ANS138, etc...). Wells used as a blank should be called "blank".  
 4. For **RpoS**, please give the % of wild-type in your condition, as determined by previous western blotting experiments. Wild-type = 100, knock-out = 0. Enter NA for wells used as a blank.  
-5. For **dilutionFactor**, if you diluted your cells 1:n before adding them to the reaction/plate, give the value of n. (E.g. if you diluted your cells 1:100 before adding a volume to be assayed, enter 100 here.) Enter NA for wells used as a blank.
+5. For **dilutionFactor**, if you diluted your cells 1:n before adding them to the reaction/plate, give the value of n. (E.g. if you diluted your cells 1:100 before adding a volume to be assayed, enter 100 here.) If you did not dilute your cells, enter 1. Enter NA for wells used as a blank.
 6. For **volumeAssayed**, give the volume of (possibly diluted) cells in mL you added to the tube when you assayed. This is usually 0.1 or 0.5. Enter NA for wells used as a blank.
 7. For **reactionTime**, give the length of time the reaction proceeded before adding stop solution in minutes. Enter NA for wells used as a blank.
 
@@ -39,7 +39,7 @@ Then, copy your data file to the folder/directory `myData`.
 
 This code makes heavy use of tidyverse tools. FMI, I can't speak highly enough of the (free) book R for Data Science: http://r4ds.had.co.nz/ 
 
-If this is the first time running this file, you may need to install the packages below. You can do this with the following command:   `install.packages(c("readxl", "tidyverse")` . Once those packages are installed, you should be able to run the code. 
+If this is the first time running this file, you may need to install the packages below. You can do this with the following command:   `install.packages(c("readxl", "tidyverse"))` . Once those packages are installed, you should be able to run the code. 
 
 ```{r, message=FALSE}
 library(readxl)
@@ -51,7 +51,7 @@ source("betaGalAnalysisFunctions.R")
 ###To start the analysis, read in the data.
 
 ```{r}
-fileName <- "sampleData/6-6-18 LB32_LB73.xlsx" #Enter your Excel file here. Remember that tab completion will help you get the path & name correct
+fileName <- "mydata/7.18.18 core.xlsx" #Enter your Excel file here. Remember that tab completion will help you get the path & name correct
 OD420data <- read_excel(fileName, sheet = 2)
 OD600data <- read_excel(fileName, sheet = 3)
 ```
@@ -98,5 +98,18 @@ These are the replciates we use for actual calcualations of sensitivity
 ```{r}
 expressionLevels <- meanExpressionOneReplicate(fileName)
 ```
+Plot individual strains
+```{r}
 
+strainName <- "FR40"
+singlestrainMiller <- combinedData$`Miller Units`[combinedData$strain == strainName]
+singlestrainRpoS <- combinedData$RpoS[combinedData$strain == strainName]
+
+
+plot(singlestrainMiller ~ singlestrainRpoS, xlab ="% wildtype RpoS", ylab = "Miller Units", main = strainName)
+
+
+
+
+```
 
