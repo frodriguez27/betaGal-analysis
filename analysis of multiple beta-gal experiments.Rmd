@@ -15,7 +15,7 @@ library(tidyverse)
 source("betaGalAnalysisFunctions.R")
 theme_set(theme_classic())
 
-fileNames <- c("sampleData/6-6-18 LB32_LB73.xlsx","sampleData/6-6-18 LB32_LB73 fake data for testing.xlsx")
+fileNames <- c( "mydata/7.19.18 FRLZ Strain 31 33.xlsx","mydata/7.20.18 FRLZ Strain 31 33.xlsx","mydata/7.19.18 FRLZ Strain 32 30.xlsx","mydata/7.20.18 FRLZ Strain 32 30.xlsx")
 
 processedFiles <- map(fileNames, meanExpressionOneReplicate)
 
@@ -34,12 +34,21 @@ dayMeans <- combinedData %>%
               mutate(upperErrorBar = meanAcrossDays + sdAcrossDays, lowerErrorBar = meanAcrossDays - sdAcrossDays)
 
 ggplot(dayMeans) + 
-  geom_point(aes(x = RpoS, y = meanAcrossDays)) + 
-  geom_errorbar(aes(x = RpoS, y = meanAcrossDays, ymax = upperErrorBar, ymin = lowerErrorBar)) + 
+  geom_point(aes(x = RpoS, y = meanAcrossDays), width=10, size=0.5) + 
+  geom_errorbar(aes(x = RpoS, y = meanAcrossDays, ymax = upperErrorBar, ymin = lowerErrorBar), width=10, size=0.5) + 
   facet_grid(.~strain)
 
   
 ```
+```{r}
+strainName <- "FR30"
+oneStrainData <- subset(dayMeans,strain == strainName)
+ggplot(oneStrainData) + 
+  geom_point(aes(x = RpoS, y = meanAcrossDays), width=5, size=0.5) + 
+  geom_errorbar(aes(x = RpoS, y = meanAcrossDays, ymax = upperErrorBar, ymin = lowerErrorBar), width=5, size=0.5) + 
+  facet_wrap(.~strain, ncol=2) + labs(x = "% of wild-type RpoS", y = " Miller Units")
+```
+
 ##Sensitivity
 
 This section is specific for analyzing the sensitivity of a promoter. It requires three RpoS levels.
@@ -48,7 +57,7 @@ This function expects three RpoS levels, so for this example I'll subset out som
 
 ```{r}
 dataForSensitivity <- combinedData %>% 
-                        filter(RpoS == 0 | RpoS == 19 | RpoS == 94) 
+                        filter(RpoS == 0 | RpoS == 26 | RpoS == 89) 
 ```
 
 
@@ -65,7 +74,7 @@ Plot the data with a line to illustrate null expectation used to assess sensitiv
 
 ```{r}
 segmentEnds <- dayMeans %>%
-                filter(RpoS == 0 | RpoS == 94) %>%
+                filter(RpoS == 0 | RpoS == 89) %>%
                 group_by(strain) %>%
                 summarise(
                   RpoS_min = min(RpoS),
@@ -80,9 +89,9 @@ segmentEnds <- dayMeans %>%
 If you designed your experiment with only three RpoS levels, delete the the `filter` step. Note that we have to go back a step to use use the `dayMeans` tibble.
 ```{r}
 dayMeans %>% 
-  filter(RpoS == 0 | RpoS == 19 | RpoS == 94) %>% 
+  filter(RpoS == 0 | RpoS == 26 | RpoS == 89) %>% 
   ggplot() + 
-  geom_point(aes(x = RpoS, y = meanAcrossDays, size = 4), show.legend = FALSE) + 
+  geom_point(aes(x = RpoS, y = meanAcrossDays), show.legend = FALSE) + 
   geom_errorbar(aes(x = RpoS, y = meanAcrossDays, ymax = upperErrorBar, ymin = lowerErrorBar)) + 
   facet_grid(.~strain) +
   geom_segment(data = segmentEnds, mapping = aes(x = RpoS_min, xend = RpoS_max, y = expression_min, yend = expression_max)) +
